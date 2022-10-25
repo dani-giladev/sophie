@@ -1,0 +1,4 @@
+        // [CA_MODULE_DESCRIPTION] grants
+        $[MODULE_NAME]_rendered_form = (isset($params['[MODULE_NAME]_rendered_form']))? ($params['[MODULE_NAME]_rendered_form'] == 'true') : null;
+        $[MODULE_NAME]_grants_group = (isset($params['[MODULE_NAME]_grants_group']))? $params['[MODULE_NAME]_grants_group'] : null;
+// [WIZARD_MODULE_TAG_USER_SAVE]

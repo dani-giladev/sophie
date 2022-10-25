@@ -1,0 +1,4 @@
+                // [CA_MODULE_DESCRIPTION] grants
+                $item['[MODULE_NAME]_grants_group'] = (isset($item['[MODULE_NAME]_grants']['group']))? $item['[MODULE_NAME]_grants']['group'] : '';
+
+// [WIZARD_MODULE_TAG_USER_GETALL]

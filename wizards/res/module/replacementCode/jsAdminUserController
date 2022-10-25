@@ -1,0 +1,7 @@
+        var [MODULE_NAME]_fieldset = form.down('[alias=widget.admin-user-modules-[MODULE_NAME]]');
+        if ([MODULE_NAME]_fieldset)
+        {
+            params['[MODULE_NAME]_rendered_form'] = ([MODULE_NAME]_fieldset.rendered_form);
+        }
+
+// [WIZARD_MODULE_TAG]

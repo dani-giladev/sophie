@@ -1,0 +1,7 @@
+        
+        // [CA_MODULE_DESCRIPTION] Admin (Created by wizard)
+        ,'App.modules.[MODULE_NAME].UI.view.userGroup.userGroup',
+        'App.modules.[MODULE_NAME].UI.view.user.user',
+        'App.modules.[MODULE_NAME].UI.view.config.config'
+        // [CA_MODULE_DESCRIPTION]
+// [WIZARD_MODULE_TAG]

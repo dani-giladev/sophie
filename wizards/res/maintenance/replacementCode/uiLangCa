@@ -1,0 +1,11 @@
+    ,"[MAINTENANCE_NAME]" => array(
+        "[MAINTENANCE_NAME]_plural" => "[CA_MAINTENANCE_DESCRIPTION]s",
+        "add" => "Nou [CA_MAINTENANCE_DESCRIPTION]",
+        "edition" => "Edició de [CA_MAINTENANCE_DESCRIPTION]",
+        "select" => "Seleccioni un [CA_MAINTENANCE_DESCRIPTION]",
+        "selection" => "Selecció de [CA_MAINTENANCE_DESCRIPTION]",
+        "select_please" => "Seleccioni un [CA_MAINTENANCE_DESCRIPTION], si us plau.",
+        "nonexistent" => "Aquest [CA_MAINTENANCE_DESCRIPTION] no existeix"
+    )
+    
+// [WIZARD_MAINTENANCE_TAG]

@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd base/UI-dev/
+./../libs/Sencha/Cmd/6.2.2.36/sencha app refresh
+cd ../../

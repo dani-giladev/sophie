@@ -1,0 +1,19 @@
+Countries
+---------
+http://www.countries-list.info/Download-List
+
+
+Postal codes
+------------
+https://codigospostales.com/descarga.html
+
+codciu.txt
+
+Es un fichero índice que contiene los nombres de las 50 provincias españolas y las 2 ciudades autónomas, así como las ciudades suficientemente grandes que se dividen en varios códigos postales en función de las calles.
+Los dos primeros dígitos corresponden con el código de provincia. El siguiente dígito indica si se trata del nombre de la provincia (x), de la capital de la provincia (0) o si se trata de una de las "grandes" ciudades (1,2,...). Por ejemplo la provincia de código 33 es Asturias, su capital es Oviedo, y las ciudades de Gijón y Avilés tienen varios códigos.
+
+Extracto de 280codpos.txt
+
+Se trata de 151 ficheros que tienen una correspondencia con cada uno de los registros del fichero codciu.txt. 
+Las 5 primeras posiciones son el código postal, un separador y el nombre de la calle o población en su caso.
+

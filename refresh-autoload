@@ -1,0 +1,5 @@
+#!/bin/bash
+
+cd REST/
+php composer.phar dumpautoload
+cd ../

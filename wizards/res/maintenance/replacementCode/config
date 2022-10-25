@@ -1,0 +1,7 @@
+                    array(
+                        "alias"     => "[MODULE_NAME]-[MAINTENANCE_NAME]",
+                        "icon"      => "[ICON]",
+                        "label"     => "",
+                        "children"  => array()
+                    ),
+// [WIZARD_MAINTENANCE_MENU_UI_TAG]  

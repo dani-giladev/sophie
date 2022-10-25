@@ -1,0 +1,6 @@
+        // [CA_MODULE_DESCRIPTION] grants
+        if ($[MODULE_NAME]_rendered_form)
+        {
+            $doc['[MODULE_NAME]_grants']['group'] = $[MODULE_NAME]_grants_group;
+        }
+// [WIZARD_MODULE_TAG_USER_SAVE_VAR]

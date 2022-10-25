@@ -1,0 +1,13 @@
+
+UNDO/RESET MODULE (for testing):
+--------------------------------
+
+cd /home/administrador/NetBeansProjects/sophie
+sudo rm -rf modules/crm/ && sudo rm -rf REST/app/route/crm/ && sudo rm -rf base/UI-dev/app/plugins/modules/crm/
+
+goto: base/UI-dev/app/controller/main/Main.js -> delete code before [WIZARD_MODULE_TAG]
+goto: modules/admin/model/user.php -> delete code before [WIZARD_MODULE_TAG]
+goto: modules/admin/controller/user.php -> 
+    delete code before [WIZARD_MODULE_TAG_USER_GETALL]
+    delete code before [WIZARD_MODULE_TAG_USER_SAVE]
+    delete code before [WIZARD_MODULE_TAG_USER_SAVE_VAR]

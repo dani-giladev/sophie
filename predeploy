@@ -1,0 +1,375 @@
+#!/usr/bin/php
+
+<?php
+
+$autoloadfile = __DIR__."/REST/vendor/autoload.php";
+require_once($autoloadfile);
+
+// Controllers
+use base\core\controller\init;
+
+/**
+ * This script should be executed before publishing a new version
+ *
+ * @author Xavier Piquer
+ * @author Dani Gilabert
+ */
+class predeploy
+{
+    private $_version_file = "base/config.php";
+    private $_builder_path = "";
+    private $_builder_file = "build.sh";
+    private $_old_version_value = null;
+    private $_new_version_value = null;
+    private $_build_segment = "build";
+    private $_deployment_params = array();
+    private $_fake = false;
+    private $_branch = 'development';
+    
+    public function init()
+    {
+        $init_controller = new init();
+        $this->_deployment_params = $init_controller->config->DEPLOYMENT;
+        
+        if(!$this->_checkCurrentGitBranch())
+        {
+            echo "\nWARNING, you are not in 'development' git branch. Move to 'development' branch and execute this script again.\n";
+            die();
+        }
+        
+        $shortopts  = "";
+        $shortopts .= "f::";
+        $shortopts .= "v::";
+        $shortopts .= "h::";
+        $shortopts .= "p::";
+        $shortopts .= "d::";
+        $shortopts .= "c::";
+        $shortopts .= "m::";
+        $shortopts .= "b::";
+        
+        $longopts  = array(
+            "help::",
+            "fake::"
+        );
+        
+        $options = getopt($shortopts, $longopts);
+        
+        if(count($options) == 0)
+        {
+            $options["h"] = false;
+        }
+        
+        if (isset($options['b']))
+        {
+            $this->_branch = $options['b'];
+        }
+        
+        // Set default new version like the older
+        //$this->_new_version_value = trim(file_get_contents($this->_version_file));
+        
+        foreach($options as $key => $value)
+        {
+            switch($key)
+            {
+                case "h":
+                case "help":
+                case "":
+                    $this->_showHelp();
+                    die();
+                break;
+                case "v":
+                    $this->_build_segment = $value;
+                    $this->_updateVersionFile(true);
+                break;
+                case "f":
+                    $this->_new_version_value = $value;
+                    $this->_updateVersionFile(true);
+                break;
+                case "p":
+                case "d":
+                case "c":
+                case "b":
+                    
+                break;
+                case "fake":
+                    $this->_fake = true;
+                break;
+                default:
+                   echo "Sorry. Wrong param ".$key.".\n";
+                   die();
+                break;
+            }
+        }
+        
+        $doBuild = (key_exists("v", $options) || key_exists("f", $options)) ? true : false;
+        $doPush = (key_exists("p", $options)) ? true : false;
+        $doDeploy = (key_exists("d", $options)) ? true : false;
+        $doCompact = (key_exists("c", $options)) ? true : false;
+        
+        $this->_proceed($doBuild, $doPush, $doDeploy, $doCompact);
+    }
+    
+    protected function _checkCurrentGitBranch()
+    {
+        $branch_raw = \exec('git branch -a | grep "*"');
+        $branch = preg_split("/ /", $branch_raw);
+        
+        if($branch[1] !== "development")
+        {
+            return false;
+        }
+        
+        return true;
+    }
+    
+    protected function _proceed(
+            $doBuild = true, 
+            $doPush = false, 
+            $doDeploy = false, 
+            $doCompact = false)
+    {
+        $build_msg = ($doBuild) ? ("Software version will be updated from ".$this->_old_version_value." to ".$this->_new_version_value) : "";
+        $compact_msg = ($doCompact) ? ("UI will be compacted.") : "";
+        $push_msg = ($doPush) ? "Files will be sent to repositories." : "";
+        $important_msg = ($doPush) ?  ("IMPORTANT! You must execute this script from ".$this->_branch." BRANCH.)") : "";
+        $deploy_msg = ($doDeploy) ? ("Changes will be deployed to the production host: ".$this->_deployment_params['host']) : "";
+                
+        $msg = <<<EOT
+            Ok. Everything ready. Following operations will be performed:
+                
+            {$build_msg}
+            {$compact_msg}
+            {$push_msg}
+            {$important_msg}
+            {$deploy_msg}
+            
+            Type 'yes' to continue:
+EOT;
+        echo $msg;
+        $handle = fopen ("php://stdin","r");
+        $line = fgets($handle);
+        if(trim($line) != 'yes')
+        {
+            echo "ABORTING!\n";
+            exit;
+        }
+        
+        echo "\n";
+        echo "Thank you, continuing...\n";
+        
+        if ($doBuild)
+        {
+            if($this->_fake)
+            {
+                echo "Simulated version upgrade from ".$this->_old_version_value." to ".
+                        $this->_new_version_value.PHP_EOL;
+                $this->_updateVersionFile(true);
+            }
+            
+            $this->_updateVersionFile(false);
+            $this->_createUILinks();
+            //$this->_urlRedirections();
+        }
+        
+        if($doCompact)
+        {
+            $this->_compactUI();
+        }
+        
+        if($doPush)
+        {
+            $this->_gitPush();
+        }
+        
+        if($doDeploy)
+        {
+            $this->_deploy();
+        }
+        
+        echo "\n\nProcess finished. Enjoy!\n\n";
+        
+        return true;
+    }
+    
+    protected function _compactUI()
+    {
+        $cmd = '';
+        if (!empty($this->_builder_path))
+        {
+            $cmd .= "cd ".$this->_builder_path." && ";
+        }
+        $cmd .= "./".$this->_builder_file.' '.$this->_new_version_value;
+        
+        if(!$this->_fake)
+        {
+            system($cmd);
+        }
+        else
+        {
+            echo $cmd.PHP_EOL;
+        }
+    }
+    
+    protected function _gitPush()
+    {
+        $git_orders = array(
+            'git add --all',
+            'git commit -m "Sophie version '.$this->_new_version_value.' ready to publish."',
+            'git pull origin '.$this->_branch,
+            'git push origin '.$this->_branch
+        );
+        
+        if ($this->_branch === 'development')
+        {
+            array_push($git_orders, 
+                'git checkout production',
+                'git merge development',
+                'git pull origin production',
+                'git push origin production',
+                'git checkout development'                    
+            );
+        }
+        
+        foreach($git_orders as $order)
+        {
+            if(!$this->_fake)
+            {
+                system($order);
+            }
+            else
+            {
+                echo $order.PHP_EOL;
+            }
+        }
+    }
+    
+    protected function _deploy()
+    {
+        if (!$this->_fake)
+        {
+            echo 'Deploying... '.$this->_deployment_params['hostname'].PHP_EOL;
+            system('ssh root@'.$this->_deployment_params['host'].' bash -s < deploy.sh');
+        }
+        else
+        {
+            echo 'ssh root@'.$this->_deployment_params['host'].' bash -s < deploy.sh'.PHP_EOL;
+        }
+    }
+    
+    protected function _createUILinks()
+    {
+        $target_path = "base/UI/app/plugins/";
+
+        foreach (new \DirectoryIterator('modules') as $file_info) 
+        {
+            if($file_info->isDot()) continue;
+
+            if($file_info->isDir())
+            {
+                if($file_info->isDir())
+                {
+                    $t_mod_path = $target_path.$file_info->getPathname();
+                    $target_mod_path = $t_mod_path."/UI";
+                    
+                    if(!\file_exists($t_mod_path))
+                    {
+                        @\mkdir($t_mod_path, 0755, true);
+                    }
+
+                    @\symlink("../../../../../../".$file_info->getPathname()."/UI", $target_mod_path);
+                }
+            }
+        }         
+    }
+    
+    protected function _urlRedirections()
+    {
+        @\symlink("UI/build/production/App", "base/UI-".$this->_new_version_value);
+        @\unlink("base/UI-".$this->_old_version_value);
+    }
+    
+    protected function _updateVersionFile($fake = false)
+    {
+        $config_file_contents = trim(file_get_contents($this->_version_file));
+        include($this->_version_file);
+        $this->_old_version_value = $config['VERSION'];
+        
+        // $this->_old_version_value = trim(file_get_contents($this->_version_file));
+        
+        if(is_null($this->_new_version_value))
+        {
+            $c_version = preg_split("/\./", $this->_old_version_value);
+            
+            switch($this->_build_segment)
+            {
+                case "major":
+                    $c_version[0]++;
+                    $c_version[1] = 0;
+                    $c_version[2] = 0;
+                    $c_version[3] = 0;
+                break;
+                case "minor":
+                    $c_version[1]++;
+                    $c_version[2] = 0;
+                    $c_version[3] = 0;
+                break;
+                case "revision":
+                    $c_version[2]++;
+                    $c_version[3] = 0;
+                break;
+                case "build":
+                    $c_version[3]++;
+                break;
+                default:
+                    echo "Sorry. Wrong param ".$version_segment.".\n";
+                    die();
+                break;
+            }
+            
+            $this->_new_version_value = $c_version[0].".".$c_version[1].".".$c_version[2].".".$c_version[3];
+        }
+        
+        if(!$fake)
+        {
+            $res_contents = preg_replace("/".$this->_old_version_value."/", $this->_new_version_value, $config_file_contents);
+
+            file_put_contents($this->_version_file, $res_contents);
+        }
+    }    
+    
+    protected function _showHelp()
+    {
+        $help_text = <<<EOT
+This script could do the following:
+
+Examples of use of predeploy:
+./predeploy -h | --help         -> Show this help text
+./predeploy --fake              -> will simulate process
+./predeploy -f2.0.13.1          -> will force version number
+./predeploy -vmajor             -> will increase to <3>.0.0.0
+./predeploy -vminor             -> will increase to 2.<1>.0.0
+./predeploy -vrevision          -> will increase to 2.0.<14>.0
+./predeploy -vbuild             -> will increase to 2.0.13.<2>
+./predeploy -p                  -> will merge/send changes to development and production repos
+./predeploy -p -b[branch]       -> will merge/send changes to repos from [branch]
+./predeploy -c                  -> will compact UI
+./predeploy -d                  -> will deploy to production host
+                            
+Examples:
+./predeploy -vbuild -c -p -bproduction      -> will increase build number, compact UI, merge/send changes to production branch
+./predeploy -f2.0.13.1 -p                   -> will force version number to 2.0.13.1 and merge/send changes to repos
+./predeploy -vbuild -p                      -> will increase build number and merge/send changes to repos
+./predeploy -p --fake                       -> will simulate merging/sending changes to repos
+./predeploy -vbuild -p -d                   -> will increase build number, merge/send changes to repos and deploy changes to production host
+./predeploy -vbuild -c -p -d                -> will increase build number, compact UI, merge/send changes to repos and deploy changes to production host
+./predeploy -p -d -bproduction              -> merge/send changes to repos and deploy changes to production host (from production branch)
+                
+\n\n
+EOT;
+        
+        echo $help_text;
+    }
+}
+
+$predeploy = new predeploy();
+$predeploy->init();

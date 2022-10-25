@@ -1,0 +1,123 @@
+
+.main-tabpanel-enabled .x-tab-bar-default-top {
+    background : lightskyblue;
+    background-image: none !important;
+}
+.main-tabpanel-disabled .x-tab-bar-default-top {
+    background : transparent;
+    background-image: none !important;
+}
+
+.button-std {
+    font-size: 16px;
+}
+
+/*.x-btn.main-menu-btn {
+    background: gray;
+}
+
+.x-btn.main-menu-btn-over {
+    background: black;
+}
+
+.main-menu-btn.x-btn.x-btn-pressed  {
+    background: black;
+}
+.x-main-menu-btn-pressed {
+    background: black;
+}
+.x-btn-pressed.main-menu-btn {
+    background: black !important;
+}*/
+
+.x-btn.main-menu-btn .x-btn-inner {
+    display: flex;
+    height: 40px;
+    justify-content: center;
+    align-items: center;
+}
+
+.x-btn.main-menu-big-btn .x-btn-inner {
+    font-size: 18px;
+    height: 40px;
+/*    border: 1px red solid;*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.color-red {
+    color: red;
+}
+
+
+/*
+* Logout button
+*/
+
+.x-btn.logout-btn .x-btn-inner {
+    /*font-size: 18px;*/
+}
+.x-btn.logout-btn {
+    background: darkred;
+}
+
+.x-btn.logout-btn-over {
+    background: red;
+}
+
+/*
+* Grid
+*/
+.x-grid-row-summary {
+/*    background-color: green;
+    color: white;*/
+}
+.custom-grid-feature-grouping {
+    background-color: lightskyblue;
+    color: white;
+    cursor: pointer;
+    padding: 10px;
+    font-weight: bold;    
+}
+.x-grid-cell {
+  vertical-align: middle;
+}
+
+/**************************************/
+/* Maintenances */
+/**************************************/
+.maintenance-color-red {
+    background: red;
+}
+.maintenance-color-green {
+    background: green;
+}
+.maintenance-color-yellow {
+    background: yellow;
+}
+.maintenance-color-pink {
+    background: pink;
+}
+.maintenance-color-violet {
+    background: violet;
+}
+.maintenance-color-black {
+    background: black;
+}
+.maintenance-color-blue {
+    background: blue;
+}
+.maintenance-color-orange {
+    background: orange;
+}
+.maintenance-color-olive {
+    background: olive;
+}
+
+/*************************************/
+/* Grid row background */
+/*************************************/
+.grid-row-background-red {
+    background: #ffcdcd;
+}

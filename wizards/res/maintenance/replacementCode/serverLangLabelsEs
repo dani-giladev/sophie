@@ -1,0 +1,5 @@
+    ,"[MAINTENANCE_NAME]" => array(
+        "the_[MAINTENANCE_NAME_lowercase]_with_code" => "El [ES_MAINTENANCE_DESCRIPTION] con código"
+    )
+
+// [WIZARD_MAINTENANCE_LABELS_TAG]
